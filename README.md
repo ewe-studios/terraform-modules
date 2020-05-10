@@ -24,7 +24,7 @@ a version number bump.
  
 ## Who maintains this Module?
 
-This Module is maintained by [Alexander Ewetumo](http://github.com/influx6). 
+This Module is maintained by [Dream Bench Technologies](http://github.com/influx6). 
 
 ## How do I contribute to this Module?
 
