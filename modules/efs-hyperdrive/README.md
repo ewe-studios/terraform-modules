@@ -40,3 +40,5 @@ echo $efs_id:/ /efs efs defaults,_netdev 0 0 >> /etc/fstab
 ```
 
 Where `${efs_id}` is the FileSystemID of the EFS created.
+
+See https://docs.aws.amazon.com/AmazonECS/latest/developerguide/tutorial-efs-volumes.html
