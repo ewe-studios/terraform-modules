@@ -12,14 +12,6 @@ module "EC2S3IAM" {
   }
 }
 
-variable region {
-  default = "ap-southeast-1"
-}
-
 provider "aws" {
   region = var.region
-}
-
-output "ec2_policy" {
-  value = module.EC2S3IAM.ec2_iam_instance_profile
 }
