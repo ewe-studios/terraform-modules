@@ -1,5 +1,5 @@
 # Terraform Modules
-This repository contains [Terraform](https://www.terraform.io/) modules in the [Modules](./modules) directory for deploying on [AWS](https://aws.amazon.com/) different infrastructures as needed by me.
+This repository contains [Terraform](https://www.terraform.io/) modules in the [Modules](./modules) directory for deploying on [AWS](https://aws.amazon.com/) and other infrastructure providers as we needed with different infrastructures as needed by us.
 
 ## How to use this Module
 
