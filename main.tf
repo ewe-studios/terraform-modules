@@ -7,7 +7,7 @@ module "EC2S3IAM" {
 
   owner = "Better Macs"
   buckets = ["*"]
-  tags {
+  tags = {
     Region = "Lagos/Nigeria"
   }
 }
