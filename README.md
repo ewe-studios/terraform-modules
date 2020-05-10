@@ -5,9 +5,9 @@ This repository contains [Terraform](https://www.terraform.io/) modules in the [
 
 This repo has the following folder structure:
 
-* [modules](https://github.com/hashicorp/terraform-aws-consul/tree/master/modules): This folder contains several standalone, reusable, production-grade modules that you can use to deploy Consul.
-* [examples](https://github.com/hashicorp/terraform-aws-consul/tree/master/examples): This folder shows examples of different ways to combine the modules in the `modules` folder to deploy Consul.
-* [root folder](https://github.com/hashicorp/terraform-aws-consul/tree/master): The root folder is *an example* of how to use the varying modules
+* [modules](https://github.com/Dream-Bench-Technologies/terraform-modules/tree/master/modules): This folder contains several standalone, reusable, production-grade modules that you can use to deploy Consul.
+* [examples](https://github.com/Dream-Bench-Technologies/terraform-modules/tree/master/examples): This folder shows examples of different ways to combine the modules in the `modules` folder to deploy Consul.
+* [root folder](https://github.com/Dream-Bench-Technologies/terraform-modules/tree/master): The root folder is *an example* of how to use the varying modules
 
 ## What's a Module?
 
@@ -28,7 +28,7 @@ This Module is maintained by [Alexander Ewetumo](http://github.com/influx6).
 
 ## How do I contribute to this Module?
 
-Contributions are very welcome! Check out the [Contribution Guidelines](https://github.com/hashicorp/terraform-aws-consul/tree/master/CONTRIBUTING.md) for instructions.
+Contributions are very welcome! Check out the [Contribution Guidelines](https://github.com/Dream-Bench-Technologies/terraform-modules/tree/master/CONTRIBUTING.md) for instructions.
 
 
 ## How is this Module versioned?
