@@ -46,7 +46,7 @@ variable security_groups {
 variable subnet_id {
   type = string
   description = "subnet id to be used by efs mount point"
-  default = "subnet-63f3233a"
+  default = "subnet_id"
 }
 
 variable ip_address {

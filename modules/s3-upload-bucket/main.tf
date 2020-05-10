@@ -5,6 +5,7 @@ terraform {
 resource "aws_s3_bucket" "bucket_access_logs" {
   bucket = "${var.name}-access-logs"
   acl    = "log-delivery-write"
+  force_destroy = var.force_destroy
 
   tags = merge(var.tags, {
     Name  = "${var.name}_access_logs"
@@ -20,6 +21,7 @@ locals {
 resource "aws_s3_bucket" "bucket" {
   bucket = var.name
   acl    = var.acl_name
+  force_destroy = var.force_destroy
 
   versioning {
     enabled = var.versions

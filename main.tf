@@ -14,6 +14,8 @@ module "EC2S3IAM" {
 
 module "EFS" {
   source = "./modules/efs-hyperdrive"
+  subnet_id = "subnet-63f3233a"
+  security_groups = ["sg-5c231526"]
 
   owner = "Better Macs"
   tags = {
@@ -23,7 +25,8 @@ module "EFS" {
 
 module "ProjectS3" {
   source = "./modules/s3-upload-bucket"
-  name = "project-bucket"
+  name = "project-bucket-34321342242423432"
+  force_destroy = true
 
   owner = "Better Macs"
   tags = {

@@ -8,9 +8,14 @@ variable zipped {
   default = true
 }
 
+variable force_destroy {
+  description = "Force the destruction of objects for bucket"
+  default = false
+}
+
 variable versions {
   description = "Enabled/Disable versioning for bucket"
-  default = true
+  default = false
 }
 
 variable acl_name {
