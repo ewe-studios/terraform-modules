@@ -1,0 +1,14 @@
+.DS_Store
+
+*.log
+logs
+.env
+data
+
+# Compiled files
+*.tfstate
+*.tfstate.backup
+.terraform.tfstate.lock.info
+
+# Module directory
+.terraform/
