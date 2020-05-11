@@ -171,7 +171,7 @@ resource "aws_security_group" "HAEC2PrivateSecurityGroup" {
     from_port = 0
     to_port = 0
     protocol = "-1"
-    cidr_blocks = [aws_security_group.HAEC2PublicSecurityGroup.id]
+    security_groups = [aws_security_group.HAEC2PublicSecurityGroup.id]
     description = "Allow public security group access to this security group"
   }
 
