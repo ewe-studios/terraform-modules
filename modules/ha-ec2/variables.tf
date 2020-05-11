@@ -41,7 +41,7 @@ variable ec2_user_data {
   default = <<EOF
     #!/bin/bash
     yum update -y
-    yum install httpd24 -y
+    yum install httpd -y
     service httpd start
     chkconfig httpd on
 
