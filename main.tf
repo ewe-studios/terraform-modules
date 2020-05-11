@@ -59,8 +59,10 @@ module "HACloud" {
 
 module "HAEC2" {
   source = "./modules/ha-ec2"
+  availability_zones = 4
+  ec2_keypair_name = "WOLS"
 
-  name = "education-system"
+  project = "BetterMacSystem"
   owner = "Better Macs"
   tags = {
     Region = "Lagos/Nigeria"

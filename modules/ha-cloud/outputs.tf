@@ -5,3 +5,7 @@ output "public-internet-gatway" {
 output "vpc" {
   value = aws_vpc.HACloudVPC
 }
+
+output "IAM" {
+  value = module.IAM
+}
