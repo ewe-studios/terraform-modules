@@ -36,6 +36,39 @@ variable tags {
   default = {}
 }
 
+variable ec2_user_data {
+  description = "EC2 instance keypair name"
+  defaultf = <<EOF
+    #!/bin/bash
+    yum update -y
+    yum install httpd24 -y
+    service httpd start
+    chkconfig httpd on
+
+    # export instance id for this ec instance
+    export INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
+  EOF
+}
+
+variable ec2_max_instances {
+  description = "EC2 instance max number of instances"
+  default = 3
+}
+
+variable ec2_min_instances {
+  description = "EC2 instance min number of instances"
+  default = 1
+}
+
+variable ec2_keypair_name {
+  description = "EC2 instance keypair name"
+}
+
+variable ec2_instance_type {
+  description = "EC2 instance type name"
+  default = "t2.micro"
+}
+
 variable vpc_tenancy {
   description = "VPC instance tenancy setting"
   default = "default"

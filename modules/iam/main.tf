@@ -3,10 +3,6 @@ terraform {
 }
 
 locals {
-  S3Name = "${var.namePrefix}-S3ImplicitRole"
-  EC2Name = "${var.namePrefix}-EC2ImplicitRole"
-  EC2InstanceName = "${var.namePrefix}-EC2InstanceProfile"
-  EC2AndAutoScalingName = "${var.namePrefix}-EC2AndAutoScalingImplicitRole"
   ec2Principals = distinct(concat(["ec2.amazonaws.com"], var.ec2_principals))
   s3Principals = distinct(concat(["s3.amazonaws.com"], var.s3_principals))
   ec2AutoScalingPrincipals = distinct(concat(["ec2.amazonaws.com", "application-autoscaling.amazonaws.com"], var.ec2_principals))
@@ -26,7 +22,7 @@ data "aws_iam_policy_document" "S3ImplicitPolicyDocument" {
 }
 
 resource "aws_iam_role" "S3ImplicitRole" {
-  name = local.S3Name
+  name = "${var.namePrefix}-S3InstanceRole"
   force_detach_policies = true
 
   # this is used to define the trust policy for the 
@@ -50,7 +46,7 @@ data "aws_iam_policy_document" "EC2ImplicitPolicyDocument" {
 }
 
 resource "aws_iam_role" "EC2ImplicitRole" {
-  name = local.EC2Name
+  name = "${var.namePrefix}-EC2InstanceRole"
   force_detach_policies = true
   
   # this is used to define the trust policy for the 
@@ -74,7 +70,7 @@ data "aws_iam_policy_document" "EC2AndAutoScalingImplicitPolicyDocument" {
 }
 
 resource "aws_iam_role" "EC2AndAutoScalingImplicitRole" {
-  name = local.EC2AndAutoScalingName
+  name = "${var.namePrefix}-EC2AndAutoScalingImplicitRole"
   force_detach_policies = true
   
   # this is used to define the trust policy for the 
@@ -84,7 +80,38 @@ resource "aws_iam_role" "EC2AndAutoScalingImplicitRole" {
   tags = merge(var.tags, { Owner = var.owner })
 }
 
+
+resource "aws_iam_role" "EC2AutoScalingCloudWatchLogs" {
+  name = "${var.namePrefix}-EC2-AutoScaling-CloudWatch-Logs"
+  force_detach_policies = true
+  
+  # this is used to define the trust policy for the 
+  # service this role is to apply to, always include.
+  assume_role_policy = data.aws_iam_policy_document.EC2AndAutoScalingImplicitPolicyDocument.json
+
+  tags = merge(var.tags, { Owner = var.owner })
+}
+
+data "aws_iam_policy_document" "EC2_AutoScale_CloudWatch_Logs" {
+  statement {
+    effect = "Allow"
+    resources = ["*"]
+    actions = [
+        "ec2:*",
+        "elasticloadbalancing:*",
+        "cloudwatch:*",
+        "logs:*",
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "EC2ELBCloudWatchAndLogsPolicy" {
+  name = "${var.namePrefix}-EC2ELBCloudWatchAndLogsPolicy"
+  role = aws_iam_role.EC2AutoScalingCloudWatchLogs
+  policy = data.aws_iam_policy_document.EC2_AutoScale_CloudWatch_Logs
+}
+
 resource "aws_iam_instance_profile" "EC2InstanceProfile" {
-  name = local.EC2InstanceName
+  name = "${var.namePrefix}-EC2InstanceProfile"
   role = aws_iam_role.EC2ImplicitRole.name
 }

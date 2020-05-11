@@ -192,7 +192,7 @@ resource "aws_security_group" "HAEC2PrivateSecurityGroup" {
   }
 }
 
-resource "aws_security_group" "HAPublicELBSecurityGroup" {
+resource "aws_security_group" "HAELBSecurityGroup" {
   name = "HAPublicELBSecurityGroup"
   description = "Security group for ELB instances in public subnets"
   vpc_id      = aws_vpc.HACloudVPC.id
@@ -212,4 +212,181 @@ resource "aws_security_group" "HAPublicELBSecurityGroup" {
     cidr_blocks = ["0.0.0.0/0"]
     description = "Allow all incoming traffic"
   }
+}
+
+data "aws_ami" "AMILunchConfigurationAmi"  {
+  most_recent = true
+
+  filter {
+    name = "owner-alias"
+    values = ["amazon"]
+  }
+}
+
+resource "aws_launch_configuration" "EC2PrivateLaunchConfiguration" {
+  image_id = data.aws_ami.AMILunchConfigurationAmi.id
+  instance_type = var.ec2_instance_type
+  key_name = var.ec2_keypair_name
+  associate_public_ip_address = false
+  security_groups = [aws_security_group.HAEC2PrivateSecurityGroup.id]
+  iam_instance_profile = module.IAM.EC2InstanceProfileRole.name
+
+  user_data = var.ec2_user_data
+}
+
+resource "aws_launch_configuration" "EC2PublicLaunchConfiguration" {
+  image_id = data.aws_ami.AMILunchConfigurationAmi.id
+  instance_type = var.ec2_instance_type
+  key_name = var.ec2_keypair_name
+  associate_public_ip_address = true
+  security_groups = [aws_security_group.HAEC2PublicSecurityGroup.id]
+  iam_instance_profile = module.IAM.EC2InstanceProfileRole.name
+
+  user_data = var.ec2_user_data
+}
+
+resource "aws_elb" "EC2PublicLoadBalancer" {
+  name = "EC2PublicLoadBalancer"
+  internal = false
+  security_groups = [aws_security_group.HAELBSecurityGroup.id]
+  subnets = aws_subnet.HACloudSubnetPublic.*.id
+
+  listener {
+    instance_port = 80
+    instance_protocol = "http"
+    lb_port = 80
+    lb_protocol = "http"
+  }
+
+  health_check {
+    healthy_threshold = 5
+    interval = 30
+    target = "HTTP:80/"
+    timeout = 10
+    unhealthy_threshold = 5
+  }
+}
+
+resource "aws_elb" "EC2PrivateLoadBalancer" {
+  name = "EC2PrivateLoadBalancer"
+  internal = true
+  security_groups = [aws_security_group.HAELBSecurityGroup.id]
+  subnets = aws_subnet.HACloudSubnetPrivate.*.id
+
+  listener {
+    instance_port = 80
+    instance_protocol = "http"
+    lb_port = 80
+    lb_protocol = "http"
+  }
+
+  health_check {
+    healthy_threshold = 5
+    interval = 30
+    target = "HTTP:80/"
+    timeout = 10
+    unhealthy_threshold = 5
+  }
+}
+
+resource "aws_autoscaling_group" "EC2PrivateAutoScalingGroup" {
+  name = "EC2PrivateAutoScalingGroup"
+  vpc_zone_identifier = aws_subnet.HACloudSubnetPrivate.*.id
+  launch_configuration = aws_launch_configuration.EC2PrivateLaunchConfiguration
+  load_balancers = [aws_elb.EC2PrivateLoadBalancer.name]
+  health_check_type = "ELB"
+  max_size = var.ec2_max_instances
+  min_size = var.ec2_min_instances
+
+  tag {
+    key = "Name"
+    propagate_at_launch = false
+    value = "EC2PrivateAutoScalingGroup"
+  }
+}
+
+resource "aws_autoscaling_group" "EC2PublicAutoScalingGroup" {
+  name = "EC2PublicAutoScalingGroup"
+  vpc_zone_identifier = aws_subnet.HACloudSubnetPublic.*.id
+  launch_configuration = aws_launch_configuration.EC2PublicLaunchConfiguration
+  load_balancers = [aws_elb.EC2PublicLoadBalancer.name]
+  health_check_type = "ELB"
+  max_size = var.ec2_max_instances
+  min_size = var.ec2_min_instances
+
+  tag {
+    key = "Name"
+    propagate_at_launch = false
+    value = "EC2PublicAutoScalingGroup"
+  }
+}
+
+resource "aws_autoscaling_policy" "EC2PrivateAutoScalingGroupPolicy" {
+  autoscaling_group_name = aws_autoscaling_group.EC2PrivateAutoScalingGroup.name
+  name = "EC2PrivateAutoScalingGroupPolicy"
+  policy_type = "TargetTrackingPolicy"
+  min_adjustment_magnitude = 1
+
+  target_tracking_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ASGAverageCPUUtilization"
+    }
+    target_value = 80
+  }
+}
+
+resource "aws_autoscaling_policy" "EC2PublicAutoScalingGroupPolicy" {
+  autoscaling_group_name = aws_autoscaling_group.EC2PublicAutoScalingGroup.name
+  name = "EC2PublicAutoScalingGroupPolicy"
+  policy_type = "TargetTrackingPolicy"
+  min_adjustment_magnitude = 1
+
+  target_tracking_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ASGAverageCPUUtilization"
+    }
+    target_value = 80
+  }
+}
+
+resource "aws_sns_topic" "EC2PublicAutoScalingGroupEvents" {
+  display_name = "EC2PublicAutoScalingGroupEvents"
+  name = "EC2PublicAutoScalingGroupEvents"
+}
+
+resource "aws_sns_topic_subscription" "EC2PublicAutoScalingGroupEventSMSSubscription" {
+  endpoint = "+85151620726"
+  protocol = "sms"
+  topic_arn = aws_sns_topic.EC2PublicAutoScalingGroupEvents.arn
+}
+
+resource "aws_autoscaling_notification" "EC2PublicAutoScalingGroupEventNotifications" {
+  group_names = [aws_autoscaling_group.EC2PublicAutoScalingGroup.name]
+  notifications = [
+    "autoscaling:EC2_INSTANCE_LAUNCH",
+    "autoscaling:EC_INSTANCE_TERMINATE",
+    "autoscaling:EC_INSTANCE_LAUNCH_ERROR",
+  ]
+  topic_arn = aws_sns_topic.EC2PublicAutoScalingGroupEvents.arn
+}
+
+resource "aws_sns_topic" "EC2PrivateAutoScalingGroupEvents" {
+  display_name = "EC2PrivateAutoScalingGroupEvents"
+  name = "EC2PrivateAutoScalingGroupEvents"
+}
+
+resource "aws_sns_topic_subscription" "EC2PrivateAutoScalingGroupEventSMSSubscription" {
+  endpoint = "+85151620726"
+  protocol = "sms"
+  topic_arn = aws_sns_topic.EC2PrivateAutoScalingGroupEvents.arn
+}
+
+resource "aws_autoscaling_notification" "EC2PrivateAutoScalingGroupEventNotifications" {
+  group_names = [aws_autoscaling_group.EC2PrivateAutoScalingGroup.name]
+  notifications = [
+    "autoscaling:EC2_INSTANCE_LAUNCH",
+    "autoscaling:EC_INSTANCE_TERMINATE",
+    "autoscaling:EC_INSTANCE_LAUNCH_ERROR",
+  ]
+  topic_arn = aws_sns_topic.EC2PrivateAutoScalingGroupEvents.arn
 }
