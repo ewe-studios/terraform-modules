@@ -1,10 +1,14 @@
 variable owner {
-  description = "Name of IAM project owner"
+  description = "Name of project owner"
   default = "mad-dev"
 }
 
+variable prefix {
+  description = "Prefix to make these IAM roles and policies unique"
+}
+
 variable tags {
-  description = "Tags for IAM and policies"
+  description = "Tags all resources"
   default = {}
 }
 

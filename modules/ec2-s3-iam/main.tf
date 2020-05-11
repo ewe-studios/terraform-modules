@@ -2,6 +2,14 @@ terraform {
   required_version = ">= 0.12"
 }
 
+module "IAM" {
+  source = "../iam"
+
+  owner = var.owner
+  namePrefix = var.prefix
+  tags = var.tags
+}
+
 data "aws_iam_policy_document" "S3ActionPolicyDocument" {
   statement {
     sid = ""
@@ -33,65 +41,17 @@ resource "aws_iam_policy" "S3ReadWriteListPolicy" {
   policy = data.aws_iam_policy_document.S3ActionPolicyDocument.json
 }
 
-resource "aws_iam_role" "S3ReadWriteListRole" {
-  name = "S3ReadWriteListRole"
-  force_detach_policies = true
-
-  # this is used to define the trust policy for the 
-  # service this role is to apply to, always include.
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "s3.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-  EOF
-
-  tags = merge(var.tags, { Owner = var.owner })
-}
-
 resource "aws_iam_policy_attachment" "S3ReadWriteListRoleAttachment" {
   name = "S3ReadWriteListRoleAttachment"
-  roles = [aws_iam_role.S3ReadWriteListRole.name]
+  roles = [module.IAM.S3ImplicitRole.name]
   policy_arn = aws_iam_policy.S3ReadWriteListPolicy.arn
-}
-
-resource "aws_iam_role" "AWSEC2ImplicitRole" {
-  name = "AWSEC2ImplicitRole"
-  force_detach_policies = true
-  
-  # this is used to define the trust policy for the 
-  # service this role is to apply to, always include.
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-  EOF
-
-  tags = merge(var.tags, { Owner = var.owner })
 }
 
 data "aws_iam_policy_document" "STSAssumePolicy" {
   statement {
     sid = ""
     effect = "Allow"
-    resources = [aws_iam_role.S3ReadWriteListRole.arn]
+    resources = [module.IAM.S3ImplicitRole.arn]
     actions = [
         "sts:AssumeRole",
     ]
@@ -105,11 +65,11 @@ resource "aws_iam_policy" "STSS3RoleAssume" {
 
 resource "aws_iam_policy_attachment" "STSAssumeRoleAttachment" {
   name = "STSAssumeRoleAttachment"
-  roles = [aws_iam_role.AWSEC2ImplicitRole.name]
+  roles = [module.IAM.EC2ImplicitRole.name]
   policy_arn = aws_iam_policy.STSS3RoleAssume.arn
 }
 
 resource "aws_iam_instance_profile" "EC2InstanceIAMProfile" {
   name = "EC2InstanceIAMProfile"
-  role = aws_iam_role.AWSEC2ImplicitRole.name
+  role = module.IAM.EC2ImplicitRole.name
 }
