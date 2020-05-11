@@ -1,11 +1,6 @@
 variable owner {
-  description = "Name of IAM project owner"
+  description = "Name of project owner"
   default = "mad-dev"
-}
-
-variable zipped {
-  description = "Upload directory as zip file"
-  default = true
 }
 
 variable force_destroy {
@@ -24,13 +19,8 @@ variable acl_name {
 }
 
 variable tags {
-  description = "Tags for IAM and policies"
+  description = "Tags all resources"
   default = {}
-}
-
-variable dir {
-  description = "Directory path to be uploaded to bucket"
-  default = "./examples"
 }
 
 variable name {

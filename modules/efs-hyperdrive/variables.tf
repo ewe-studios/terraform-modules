@@ -1,5 +1,5 @@
 variable owner {
-  description = "Name of IAM project owner"
+  description = "Name of project owner"
   default = "mad-dev"
 }
 

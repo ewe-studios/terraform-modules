@@ -2,10 +2,21 @@ terraform {
   required_version = ">= 0.12"
 }
 
+module "IAMPolicies" {
+  source = "./modules/iam"
+
+  owner = "Better Macs"
+  namePrefix = "BetterMacs"
+  tags = {
+    Region = "Lagos/Nigeria"
+  }
+}
+
 module "EC2S3IAM" {
   source = "./modules/ec2-s3-iam"
 
   owner = "Better Macs"
+  prefix = "BetterMacs"
   buckets = ["*"]
   tags = {
     Region = "Lagos/Nigeria"
@@ -28,6 +39,27 @@ module "ProjectS3" {
   name = "project-bucket-34321342242423432"
   force_destroy = true
 
+  owner = "Better Macs"
+  tags = {
+    Region = "Lagos/Nigeria"
+  }
+}
+
+module "HACloud" {
+  source = "./modules/ha-cloud"
+  availability_zones = 4
+
+  project = "BetterMacSystem"
+  owner = "Better Macs"
+  tags = {
+    Region = "Lagos/Nigeria"
+  }
+}
+
+module "HAEC2" {
+  source = "./modules/ha-ec2"
+
+  name = "education-system"
   owner = "Better Macs"
   tags = {
     Region = "Lagos/Nigeria"
