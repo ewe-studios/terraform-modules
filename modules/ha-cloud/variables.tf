@@ -38,7 +38,7 @@ variable tags {
 
 variable ec2_user_data {
   description = "EC2 instance keypair name"
-  defaultf = <<EOF
+  default = <<EOF
     #!/bin/bash
     yum update -y
     yum install httpd24 -y

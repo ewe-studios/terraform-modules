@@ -216,6 +216,7 @@ resource "aws_security_group" "HAELBSecurityGroup" {
 
 data "aws_ami" "AMILunchConfigurationAmi"  {
   most_recent = true
+  owners = ["amazon"]
 
   filter {
     name = "owner-alias"
@@ -324,7 +325,7 @@ resource "aws_autoscaling_group" "EC2PublicAutoScalingGroup" {
 resource "aws_autoscaling_policy" "EC2PrivateAutoScalingGroupPolicy" {
   autoscaling_group_name = aws_autoscaling_group.EC2PrivateAutoScalingGroup.name
   name = "EC2PrivateAutoScalingGroupPolicy"
-  policy_type = "TargetTrackingPolicy"
+  policy_type = "TargetTrackingScaling"
   min_adjustment_magnitude = 1
 
   target_tracking_configuration {
@@ -338,7 +339,7 @@ resource "aws_autoscaling_policy" "EC2PrivateAutoScalingGroupPolicy" {
 resource "aws_autoscaling_policy" "EC2PublicAutoScalingGroupPolicy" {
   autoscaling_group_name = aws_autoscaling_group.EC2PublicAutoScalingGroup.name
   name = "EC2PublicAutoScalingGroupPolicy"
-  policy_type = "TargetTrackingPolicy"
+  policy_type = "TargetTrackingScaling"
   min_adjustment_magnitude = 1
 
   target_tracking_configuration {

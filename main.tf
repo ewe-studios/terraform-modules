@@ -48,6 +48,7 @@ module "ProjectS3" {
 module "HACloud" {
   source = "./modules/ha-cloud"
   availability_zones = 4
+  ec2_keypair_name = "WOLS"
 
   project = "BetterMacSystem"
   owner = "Better Macs"
