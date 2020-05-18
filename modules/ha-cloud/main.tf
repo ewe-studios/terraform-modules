@@ -8,7 +8,7 @@ module "IAM" {
   source = "../iam"
 
   owner = var.owner
-  namePrefix = var.project
+  prefix = var.project
   tags = var.tags
 }
 

@@ -2,7 +2,7 @@ variable owner {
   description = "Name of project owner"
 }
 
-variable namePrefix {
+variable prefix {
   description = "Prefix to make IAM records unique in themselves"
 }
 

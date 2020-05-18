@@ -1,11 +1,9 @@
 variable owner {
   description = "Name of project owner"
-  default = "mad-dev"
 }
 
 variable name {
   description = "Name of EFS hyperdrive"
-  default = "mad-dev-efs"
 }
 
 variable kms {

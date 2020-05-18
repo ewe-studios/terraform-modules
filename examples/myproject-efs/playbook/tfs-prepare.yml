@@ -1,0 +1,28 @@
+---
+- name: Install EFS Tooling for AWS
+  hosts: all
+  vars:
+    packages:
+      - name: unzip
+        required: true
+      - name: bintuils
+        required: true
+      - name: wget
+        required: true
+      - name: curl
+        required: true
+  tasks:
+    - name: Install base packages
+      yum:
+        name: "{{ packages }}"
+        state: installed
+        
+
+- name: Assume S3 Role and pull bucket contents locally
+  hosts: all
+  tasks:
+    - name: "Assume aws role"
+      shell: aws sts assume-role --role-arn "{{lookup('env', 'arn')}}" --role-session-name s3-access-session
+      register: assume_role_result
+    - name: Request AWS role assume credentails
+      shell: echo "{{ assume_role_result | to_json }}"

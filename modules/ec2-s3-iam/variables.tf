@@ -3,6 +3,10 @@ variable owner {
   default = "mad-dev"
 }
 
+variable IAM {
+  description = "Attached IAM module policies from influx6/terraform-modules/modules/iam"
+}
+
 variable prefix {
   description = "Prefix to make these IAM roles and policies unique"
 }

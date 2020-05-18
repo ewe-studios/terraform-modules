@@ -10,5 +10,7 @@ data
 *.tfstate.backup
 .terraform.tfstate.lock.info
 
+*.pem
+
 # Module directory
 .terraform/

@@ -6,13 +6,14 @@ module "IAMPolicies" {
   source = "./modules/iam"
 
   owner = "Better Macs"
-  namePrefix = "BetterMacs"
+  prefix = "BetterMacs"
   tags = {
     Region = "Lagos/Nigeria"
   }
 }
 
 module "EC2S3IAM" {
+  IAM = module.IAMPolicies
   source = "./modules/ec2-s3-iam"
 
   owner = "Better Macs"
@@ -24,6 +25,7 @@ module "EC2S3IAM" {
 }
 
 module "EFS" {
+  name = "efs_hyperdrive"
   source = "./modules/efs-hyperdrive"
   subnet_id = "subnet-63f3233a"
   security_groups = ["sg-5c231526"]

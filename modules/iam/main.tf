@@ -22,7 +22,7 @@ data "aws_iam_policy_document" "S3ImplicitPolicyDocument" {
 }
 
 resource "aws_iam_role" "S3ImplicitRole" {
-  name = "${var.namePrefix}-S3InstanceRole"
+  name = "${var.prefix}-S3InstanceRole"
   force_detach_policies = true
 
   # this is used to define the trust policy for the 
@@ -46,7 +46,7 @@ data "aws_iam_policy_document" "EC2ImplicitPolicyDocument" {
 }
 
 resource "aws_iam_role" "EC2ImplicitRole" {
-  name = "${var.namePrefix}-EC2InstanceRole"
+  name = "${var.prefix}-EC2InstanceRole"
   force_detach_policies = true
   
   # this is used to define the trust policy for the 
@@ -70,7 +70,7 @@ data "aws_iam_policy_document" "EC2AndAutoScalingImplicitPolicyDocument" {
 }
 
 resource "aws_iam_role" "EC2AndAutoScalingImplicitRole" {
-  name = "${var.namePrefix}-EC2AndAutoScalingImplicitRole"
+  name = "${var.prefix}-EC2AndAutoScalingImplicitRole"
   force_detach_policies = true
   
   # this is used to define the trust policy for the 
@@ -82,7 +82,7 @@ resource "aws_iam_role" "EC2AndAutoScalingImplicitRole" {
 
 
 resource "aws_iam_role" "EC2AutoScalingCloudWatchLogs" {
-  name = "${var.namePrefix}-EC2-AutoScaling-CloudWatch-Logs"
+  name = "${var.prefix}-EC2-AutoScaling-CloudWatch-Logs"
   force_detach_policies = true
   
   # this is used to define the trust policy for the 
@@ -106,12 +106,12 @@ data "aws_iam_policy_document" "EC2_AutoScale_CloudWatch_Logs" {
 }
 
 resource "aws_iam_role_policy" "EC2ELBCloudWatchAndLogsPolicy" {
-  name = "${var.namePrefix}-EC2ELBCloudWatchAndLogsPolicy"
-  role = aws_iam_role.EC2AutoScalingCloudWatchLogs
-  policy = data.aws_iam_policy_document.EC2_AutoScale_CloudWatch_Logs
+  name = "${var.prefix}-EC2ELBCloudWatchAndLogsPolicy"
+  role = aws_iam_role.EC2AutoScalingCloudWatchLogs.id
+  policy = data.aws_iam_policy_document.EC2_AutoScale_CloudWatch_Logs.json
 }
 
 resource "aws_iam_instance_profile" "EC2InstanceProfile" {
-  name = "${var.namePrefix}-EC2InstanceProfile"
+  name = "${var.prefix}-EC2InstanceProfile"
   role = aws_iam_role.EC2ImplicitRole.name
 }
