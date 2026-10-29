@@ -5,7 +5,7 @@ terraform {
 module "EC2S3IAM" {
   source = "./modules/ec2-s3-iam"
 
-  owner = "Better Macs"
+  owner = "Better Systems"
   buckets = ["*"]
   tags = {
     Region = "Lagos/Nigeria"
